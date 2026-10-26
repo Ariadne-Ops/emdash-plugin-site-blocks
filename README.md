@@ -95,7 +95,7 @@ When a visitor dismisses a block the document gets a `sb:dismiss` event, so a la
 
 ## Notice fields, two links, and styles
 
-A notice has an optional label (`BETA`), an optional heading, a message, up to two links, and a choice for how the links look: text links, or buttons (the second link is the primary button). The admin's Style list comes from the notice type. The built-in styles are plain colours (`info`, `warning`, `promo`); a site that wants its own designs replaces the type with `siteBlocks({ types: [{ id: "notice", label: "Notice", styles: [...], fields: BUILTIN_TYPES[0].fields }] })` and styles `.sb-style-<value>` in its CSS. Every block renders inside `<aside class="sb-block sb-style-<value> sb-notice">` with `.sb-badge`, `.sb-heading`, `.sb-text` and `.sb-actions` inside.
+A notice has an optional label (`BETA`), an optional heading, a message, up to two links, and, for each link, whether it looks like a text link or a button. Of the buttons, the last is the primary one, so a text link beside one button is the "Report a problem / [Suggest a playground]" pattern. The admin's Style list comes from the notice type. The built-in styles are plain colours (`info`, `warning`, `promo`); a site that wants its own designs replaces the type with `siteBlocks({ types: [{ id: "notice", label: "Notice", styles: [...], fields: BUILTIN_TYPES[0].fields }] })` and styles `.sb-style-<value>` in its CSS. Every block renders inside `<aside class="sb-block sb-style-<value> sb-notice">` with `.sb-badge`, `.sb-heading`, `.sb-text` and `.sb-actions` inside.
 
 ## Side by side
 

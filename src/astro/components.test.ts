@@ -89,10 +89,17 @@ describe("Notice with a label, heading and two links", () => {
 		expect(out).toContain('<a class="sb-link" href="/contact">Report a problem</a>');
 		expect(out).toContain('<a class="sb-link" href="/submit">Suggest a playground</a>');
 	});
-	it("draws them as a secondary then a primary button when the look is buttons", async () => {
-		const out = await html(Notice, { block: block({ props: { ...props, linkLook: "buttons" } }) });
-		expect(out).toContain('class="sb-btn sb-btn-secondary" href="/contact"');
+	it("draws each link in its own style: a text link beside a button, the button being primary", async () => {
+		const out = await html(Notice, { block: block({ props: { ...props, linkStyle: "link", link2Style: "button" } }) });
+		expect(out).toContain('<a class="sb-link" href="/contact">Report a problem</a>');
 		expect(out).toContain('class="sb-btn sb-btn-primary" href="/submit"');
+	});
+	it("with two buttons the first is secondary and the second primary; a lone button is primary", async () => {
+		const both = await html(Notice, { block: block({ props: { ...props, linkStyle: "button", link2Style: "button" } }) });
+		expect(both).toContain('class="sb-btn sb-btn-secondary" href="/contact"');
+		expect(both).toContain('class="sb-btn sb-btn-primary" href="/submit"');
+		const lone = await html(Notice, { block: block({ props: { ...props, link2Text: "", link2Url: "", linkStyle: "button" } }) });
+		expect(lone).toContain('class="sb-btn sb-btn-primary" href="/contact"');
 	});
 	it("drops a second link whose address is unsafe or missing", async () => {
 		const out = await html(Notice, { block: block({ props: { ...props, link2Url: "javascript:alert(1)" } }) });

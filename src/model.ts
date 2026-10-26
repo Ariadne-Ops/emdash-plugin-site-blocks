@@ -30,9 +30,10 @@ export const BUILTIN_TYPES: BlockTypeDef[] = [
 			{ id: "text", label: "Message", kind: "textarea", required: true, max: 1000, help: "To link words, write [the words](/page) or [the words](https://example.com)" },
 			{ id: "linkText", label: "Link text", kind: "text", max: 60 },
 			{ id: "linkUrl", label: "Link address", kind: "url", max: 500, help: "Starts with https://, http:// or /" },
+			{ id: "linkStyle", label: "Link looks like", kind: "select", options: [{ value: "link", label: "Text link" }, { value: "button", label: "Button" }] },
 			{ id: "link2Text", label: "Second link text", kind: "text", max: 60 },
 			{ id: "link2Url", label: "Second link address", kind: "url", max: 500, help: "Starts with https://, http:// or /" },
-			{ id: "linkLook", label: "Links look like", kind: "select", options: [{ value: "links", label: "Text links" }, { value: "buttons", label: "Buttons (the second one stands out)" }] },
+			{ id: "link2Style", label: "Second link looks like", kind: "select", options: [{ value: "link", label: "Text link" }, { value: "button", label: "Button" }] },
 		],
 	},
 	{

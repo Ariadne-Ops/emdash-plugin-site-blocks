@@ -89,11 +89,11 @@ describe("width", () => {
 });
 describe("the notice type", () => {
 	it("takes a label, a heading, two links and a look for them, and checks both addresses", () => {
-		const props = { text: "Hi", heading: "Welcome", badge: "BETA", linkText: "One", linkUrl: "/a", link2Text: "Two", link2Url: "/b", linkLook: "buttons" };
+		const props = { text: "Hi", heading: "Welcome", badge: "BETA", linkText: "One", linkUrl: "/a", link2Text: "Two", link2Url: "/b", linkStyle: "link", link2Style: "button" };
 		const r = validateBlockInput(ok({ props }), cfg);
 		expect(r.ok && r.value.props).toEqual(props);
 		const bad = validateBlockInput(ok({ props: { text: "Hi", link2Text: "Two", link2Url: "javascript:x" } }), cfg);
 		expect(!bad.ok && bad.errors.join(" ")).toContain("Second link address must start with");
-		expect(validateBlockInput(ok({ props: { text: "Hi", linkLook: "huge" } }), cfg).ok).toBe(false);
+		expect(validateBlockInput(ok({ props: { text: "Hi", link2Style: "huge" } }), cfg).ok).toBe(false);
 	});
 });

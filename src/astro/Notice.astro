@@ -5,15 +5,15 @@ import { isSafeLink } from "../model";
 import type { PublicBlock } from "../public";
 interface Props { block: PublicBlock }
 const { block } = Astro.props;
-const { text = "", heading = "", badge = "", linkText = "", linkUrl = "", link2Text = "", link2Url = "", linkLook = "links" } = block.props;
+const { text = "", heading = "", badge = "", linkText = "", linkUrl = "", link2Text = "", link2Url = "", linkStyle = "link", link2Style = "link" } = block.props;
 // The message may hold [words](address) links; blank lines and line breaks read as spaces in a notice.
 const parts = parseRichText(text).flatMap((para, i) => [...(i ? [{ text: " " }] : []), ...para.map((p) => ("br" in p ? { text: " " } : p))]);
-// Up to two links, each checked again here. As buttons, the last one is the primary action.
-const links = [{ href: linkUrl, label: linkText }, { href: link2Url, label: link2Text }]
+// Up to two links, each checked again here and each drawn as a text link or a button. Of the buttons, the last is the primary one.
+const links = [{ href: linkUrl, label: linkText, button: linkStyle === "button" }, { href: link2Url, label: link2Text, button: link2Style === "button" }]
 	.filter((l) => l.href && isSafeLink(l.href))
 	.map((l) => ({ ...l, label: l.label || "Learn more" }));
-const buttons = linkLook === "buttons";
-const classFor = (i: number) => (buttons ? `sb-btn ${i === links.length - 1 ? "sb-btn-primary" : "sb-btn-secondary"}` : "sb-link");
+const lastButton = links.map((l) => l.button).lastIndexOf(true);
+const classFor = (l: { button: boolean }, i: number) => (l.button ? `sb-btn ${i === lastButton ? "sb-btn-primary" : "sb-btn-secondary"}` : "sb-link");
 ---
 <BlockShell block={block} class="sb-notice">
 	{badge && <span class="sb-badge">{badge}</span>}
@@ -21,5 +21,5 @@ const classFor = (i: number) => (buttons ? `sb-btn ${i === links.length - 1 ? "s
 		{heading && <strong class="sb-heading">{heading}</strong>}
 		<span class="sb-text">{parts.map((p) => (p.href ? <a class="sb-link" href={p.href}>{p.text}</a> : p.text))}</span>
 	</span>
-	{links.length > 0 && <span class="sb-actions">{links.map((l, i) => <a class={classFor(i)} href={l.href}>{l.label}</a>)}</span>}
+	{links.length > 0 && <span class="sb-actions">{links.map((l, i) => <a class={classFor(l, i)} href={l.href}>{l.label}</a>)}</span>}
 </BlockShell>
