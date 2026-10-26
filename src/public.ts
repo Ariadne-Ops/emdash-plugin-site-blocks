@@ -8,6 +8,7 @@ export interface PublicBlock {
 	type: string;
 	style: string;
 	dismissible: boolean;
+	width: "full" | "half";
 	props: Record<string, string>;
 	/** Changes whenever the block is edited, so a dismissed block comes back when its content changes. */
 	rev: string;
@@ -19,5 +20,5 @@ export async function regionBlocks(store: ReturnType<typeof createStore>, config
 	if (!config.regions.some((r) => r.id === region)) return { blocks: [] };
 	const path = typeof i.path === "string" && i.path.length <= 2000 ? i.path : "/";
 	const chosen = selectBlocks(await store.listPublished(), { region, path, now });
-	return { blocks: chosen.map((b) => ({ id: b.id, type: b.type, style: b.style, dismissible: b.dismissible, props: b.props, rev: b.rev ?? b.updatedAt })) };
+	return { blocks: chosen.map((b) => ({ id: b.id, type: b.type, style: b.style, dismissible: b.dismissible, width: b.width ?? "full", props: b.props, rev: b.rev ?? b.updatedAt })) };
 }

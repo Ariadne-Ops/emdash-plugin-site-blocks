@@ -25,9 +25,14 @@ export const BUILTIN_TYPES: BlockTypeDef[] = [
 		label: "Notice",
 		styles: [{ value: "info", label: "Info" }, { value: "warning", label: "Warning" }, { value: "promo", label: "Promo" }],
 		fields: [
+			{ id: "badge", label: "Label (optional)", kind: "text", max: 20, help: "A short tag before the message, such as BETA or NEW" },
+			{ id: "heading", label: "Heading (optional)", kind: "text", max: 120 },
 			{ id: "text", label: "Message", kind: "textarea", required: true, max: 1000, help: "To link words, write [the words](/page) or [the words](https://example.com)" },
 			{ id: "linkText", label: "Link text", kind: "text", max: 60 },
 			{ id: "linkUrl", label: "Link address", kind: "url", max: 500, help: "Starts with https://, http:// or /" },
+			{ id: "link2Text", label: "Second link text", kind: "text", max: 60 },
+			{ id: "link2Url", label: "Second link address", kind: "url", max: 500, help: "Starts with https://, http:// or /" },
+			{ id: "linkLook", label: "Links look like", kind: "select", options: [{ value: "links", label: "Text links" }, { value: "buttons", label: "Buttons (the second one stands out)" }] },
 		],
 	},
 	{
@@ -58,6 +63,8 @@ export interface BlockInput {
 	startsAt?: string;
 	endsAt?: string;
 	dismissible: boolean;
+	/** "half" blocks that follow each other sit side by side (on wide screens); the default is the full width. */
+	width?: "full" | "half";
 	style: string;
 	props: Record<string, string>;
 }
@@ -108,6 +115,9 @@ export function validateBlockInput(raw: unknown, cfg: Config): Validated {
 	const style = str(o.style).trim() || styles[0].value;
 	if (def && !styles.some((x) => x.value === style)) errors.push("Choose one of the listed styles.");
 
+	const width = str(o.width).trim() || "full";
+	if (width !== "full" && width !== "half") errors.push("Width must be full or half.");
+
 	const props: Record<string, string> = {};
 	const given = typeof o.props === "object" && o.props !== null ? (o.props as Record<string, unknown>) : {};
 	for (const f of def?.fields ?? []) {
@@ -127,7 +137,7 @@ export function validateBlockInput(raw: unknown, cfg: Config): Validated {
 			...(s !== undefined ? { startsAt: new Date(s).toISOString() } : {}),
 			...(e !== undefined ? { endsAt: new Date(e).toISOString() } : {}),
 			dismissible: o.dismissible === undefined ? true : o.dismissible === true || o.dismissible === "true",
-			style, props,
+			width: width as "full" | "half", style, props,
 		},
 	};
 }

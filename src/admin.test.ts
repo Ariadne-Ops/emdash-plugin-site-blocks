@@ -140,3 +140,15 @@ describe("admin output against EmDash's own Block Kit validator", () => {
 		}
 	});
 });
+
+describe("admin width", () => {
+	it("the edit form offers full or half width and saves the choice", async () => {
+		const { send, store } = setup();
+		const f = form(await send({ type: "form_submit", action_id: "add_block", values: { region: "above-header", type: "notice" } }), "save_block");
+		const w = field(f, "width");
+		expect(w.options.map((o: any) => o.value)).toEqual(["full", "half"]);
+		expect(w.initial_value).toBe("full");
+		await send({ type: "form_submit", action_id: "save_block", values: saveValues({ width: "half" }) });
+		expect((await store.list())[0].width).toBe("half");
+	});
+});

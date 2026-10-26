@@ -6,10 +6,10 @@
  * A dismissed block stays hidden for 14 days in that browser, and comes back sooner if it is edited (its revision changes).
  * The check runs in a script right after the element, so a dismissed block never flashes.
  */
-interface Props { block: { id: string; style: string; dismissible: boolean; rev: string }; class?: string; label?: string }
+interface Props { block: { id: string; style: string; dismissible: boolean; rev: string; width?: string }; class?: string; label?: string }
 const { block, class: className, label = "Site notice" } = Astro.props;
 ---
-<aside class:list={["sb-block", `sb-style-${block.style}`, className]} aria-label={label} data-sb-block={block.id} data-sb-rev={block.rev}>
+<aside class:list={["sb-block", `sb-style-${block.style}`, className]} aria-label={label} data-sb-block={block.id} data-sb-rev={block.rev} data-sb-width={block.width === "half" ? "half" : "full"}>
 	<div class="sb-body"><slot /></div>
 	{block.dismissible && <button type="button" class="sb-dismiss" aria-label="Dismiss">&times;</button>}
 </aside>
@@ -39,6 +39,13 @@ const { block, class: className, label = "Site notice" } = Astro.props;
 	:where(.sb-block) { display: flex; align-items: center; gap: 12px; padding: 8px 16px; background: var(--sb-bg, #1f2937); color: var(--sb-fg, #fff); font-size: 0.9rem; line-height: 1.4; }
 	.sb-block[hidden] { display: none !important; } /* a dismissed block stays hidden even when a site restyles .sb-block */
 	:where(.sb-body) { flex: 1; min-width: 0; }
+	/* A region lays its blocks out in rows: full-width blocks take a row, half-width blocks pair up and stack on a narrow screen. */
+	:where(.sb-region) { display: flex; flex-wrap: wrap; gap: 0 16px; }
+	:where(.sb-block[data-sb-width="full"]) { flex: 1 1 100%; }
+	:where(.sb-block[data-sb-width="half"]) { flex: 1 1 calc(50% - 8px); min-width: min(280px, 100%); }
+	:where(.sb-badge) { flex: none; font-size: 0.75em; font-weight: 700; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 99px; background: var(--sb-badge-bg, rgba(255,255,255,0.2)); }
+	:where(.sb-btn) { display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px; border-radius: 18px; font-weight: 600; white-space: nowrap; text-decoration: none; border: 1px solid currentColor; }
+	:where(.sb-btn-primary) { background: var(--sb-fg, #fff); color: var(--sb-bg, #1f2937); }
 	:where(.sb-block a) { color: var(--sb-link, inherit); text-decoration: underline; text-underline-offset: 2px; }
 	:where(.sb-dismiss) { flex: none; border: 0; background: none; color: inherit; font: inherit; font-size: 1.4rem; line-height: 1; cursor: pointer; padding: 0 4px; min-width: 32px; min-height: 32px; }
 	:where(.sb-style-warning) { --sb-bg: #92400e; }

@@ -10,7 +10,7 @@ interface Ctx { input: unknown }
 interface Draft {
 	block: string; // "new" or a block id
 	type: string; region: string; title: string; status: string; weight: number | string;
-	show: string; hide: string; startsAt: string; endsAt: string; style: string; dismissible: boolean;
+	show: string; hide: string; startsAt: string; endsAt: string; style: string; dismissible: boolean; width: string;
 	props: Record<string, string>;
 }
 
@@ -83,6 +83,7 @@ export function createAdmin(deps: { store: Store; config: Config }) {
 					{ type: "text_input", action_id: "title", label: "Name (shown only in this admin)", initial_value: d.title },
 					...def.fields.map((f) => fieldElement(f, d.props[f.id] ?? "")),
 					{ type: "select", action_id: "style", label: "Style", initial_value: d.style, options: styles.map((s) => ({ label: s.label, value: s.value })) },
+					{ type: "select", action_id: "width", label: "Width", initial_value: d.width || "full", options: [{ label: "Full width", value: "full" }, { label: "Half width (sits beside the next half-width block)", value: "half" }] },
 					{ type: "toggle", action_id: "dismissible", label: "Visitors can dismiss it", initial_value: d.dismissible },
 					{ type: "text_input", action_id: "show", label: "Show on (paths)", multiline: true, initial_value: d.show, placeholder: "Leave empty for every page" },
 					{ type: "text_input", action_id: "hide", label: "Hide on (paths)", multiline: true, initial_value: d.hide },
@@ -100,10 +101,10 @@ export function createAdmin(deps: { store: Store; config: Config }) {
 		};
 	}
 
-	const draftFromStored = (b: StoredBlock): Draft => ({ block: b.id, type: b.type, region: b.region, title: b.title, status: b.status, weight: b.weight, show: b.show, hide: b.hide, startsAt: day(b.startsAt), endsAt: day(b.endsAt), style: b.style, dismissible: b.dismissible, props: b.props });
+	const draftFromStored = (b: StoredBlock): Draft => ({ block: b.id, type: b.type, region: b.region, title: b.title, status: b.status, weight: b.weight, show: b.show, hide: b.hide, startsAt: day(b.startsAt), endsAt: day(b.endsAt), style: b.style, dismissible: b.dismissible, width: b.width ?? "full", props: b.props });
 	const draftFromValues = (v: Record<string, unknown>): Draft => ({
 		block: str(v.block) || "new", type: str(v.type), region: str(v.region), title: str(v.title), status: str(v.status) || "published", weight: str(v.weight),
-		show: str(v.show), hide: str(v.hide), startsAt: str(v.startsAt), endsAt: str(v.endsAt), style: str(v.style), dismissible: v.dismissible === true || v.dismissible === "true",
+		show: str(v.show), hide: str(v.hide), startsAt: str(v.startsAt), endsAt: str(v.endsAt), style: str(v.style), dismissible: v.dismissible === true || v.dismissible === "true", width: str(v.width),
 		props: Object.fromEntries(Object.entries(v).filter(([k]) => k.startsWith("p_")).map(([k, x]) => [k.slice(2), str(x)])),
 	});
 
@@ -138,7 +139,7 @@ export function createAdmin(deps: { store: Store; config: Config }) {
 				if (i.action_id === "add_block") {
 					const region = str(values.region), type = str(values.type), def = typeOf(type);
 					if (!def || !config.regions.some((r) => r.id === region)) return listView({ message: "Choose a region and a type.", type: "error" });
-					return editView({ block: "new", type, region, title: "", status: "published", weight: 0, show: "", hide: "", startsAt: "", endsAt: "", style: def.styles?.[0]?.value ?? "default", dismissible: true, props: {} });
+					return editView({ block: "new", type, region, title: "", status: "published", weight: 0, show: "", hide: "", startsAt: "", endsAt: "", style: def.styles?.[0]?.value ?? "default", dismissible: true, width: "full", props: {} });
 				}
 				if (i.action_id === "save_block") return save(values);
 				return { blocks: [] };

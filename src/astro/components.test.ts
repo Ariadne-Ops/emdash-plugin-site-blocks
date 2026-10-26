@@ -79,3 +79,30 @@ describe("Notice trailing link", () => {
 		expect(out).not.toContain("<a ");
 	});
 });
+
+describe("Notice with a label, heading and two links", () => {
+	const props = { text: "Help us get it right.", heading: "We are growing", badge: "BETA", linkText: "Report a problem", linkUrl: "/contact", link2Text: "Suggest a playground", link2Url: "/submit" };
+	it("shows the label and heading, and both links as text links by default", async () => {
+		const out = await html(Notice, { block: block({ props }) });
+		expect(out).toContain('<span class="sb-badge">BETA</span>');
+		expect(out).toContain("We are growing");
+		expect(out).toContain('<a class="sb-link" href="/contact">Report a problem</a>');
+		expect(out).toContain('<a class="sb-link" href="/submit">Suggest a playground</a>');
+	});
+	it("draws them as a secondary then a primary button when the look is buttons", async () => {
+		const out = await html(Notice, { block: block({ props: { ...props, linkLook: "buttons" } }) });
+		expect(out).toContain('class="sb-btn sb-btn-secondary" href="/contact"');
+		expect(out).toContain('class="sb-btn sb-btn-primary" href="/submit"');
+	});
+	it("drops a second link whose address is unsafe or missing", async () => {
+		const out = await html(Notice, { block: block({ props: { ...props, link2Url: "javascript:alert(1)" } }) });
+		expect(out).not.toContain("javascript:");
+		expect(out).not.toContain("Suggest a playground");
+	});
+});
+describe("block width", () => {
+	it("the wrapper carries the width so a site can lay half blocks side by side", async () => {
+		expect(await html(Notice, { block: block({ width: "half" }) })).toContain('data-sb-width="half"');
+		expect(await html(Notice, { block: block() })).toContain('data-sb-width="full"');
+	});
+});

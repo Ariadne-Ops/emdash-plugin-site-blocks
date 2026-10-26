@@ -24,7 +24,7 @@ describe("regionBlocks", () => {
 		await s.create(blk({ status: "draft" }));
 		await s.create(blk({ region: "footer-top" }));
 		const r = await regionBlocks(s, cfg, { region: "above-header", path: "/playground/x" }, NOW);
-		expect(r.blocks).toEqual([{ id: "id1", type: "notice", style: "info", dismissible: true, props: { text: "hi" }, rev: "2026-10-26T12:00:00.000Z" }]);
+		expect(r.blocks).toEqual([{ id: "id1", type: "notice", style: "info", dismissible: true, width: "full", props: { text: "hi" }, rev: "2026-10-26T12:00:00.000Z" }]);
 		expect(JSON.stringify(r)).not.toContain("Admin only title");
 		expect(JSON.stringify(r)).not.toContain("playground/*");
 	});
@@ -56,5 +56,15 @@ describe("loadRegion (what the Astro component calls)", () => {
 		expect(await loadRegion({ region: "r", path: "/", baseUrl: url, handlePublicPluginApiRoute: (async () => { throw new Error("boom"); }) as any })).toEqual([]);
 		expect(await loadRegion({ region: "r", path: "/", baseUrl: url, handlePublicPluginApiRoute: (async () => ({ success: false })) as any })).toEqual([]);
 		expect(await loadRegion({ region: "r", path: "/", baseUrl: url, handlePublicPluginApiRoute: (async () => ({ success: true, data: { blocks: [{ id: 1 }, "x", { id: "ok", type: "notice", style: "i", dismissible: false, props: {}, rev: "r" }] } })) as any })).toHaveLength(1);
+	});
+});
+
+describe("width on the public block", () => {
+	it("is passed on, and is full for a block stored before widths existed", async () => {
+		const s = setup();
+		await s.create(blk({ width: "half" }));
+		await s.create(blk());
+		const r = await regionBlocks(s, cfg, { region: "above-header", path: "/" }, NOW);
+		expect(r.blocks.map((b) => b.width)).toEqual(["half", "full"]);
 	});
 });

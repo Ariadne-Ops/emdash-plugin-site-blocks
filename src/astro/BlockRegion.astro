@@ -6,7 +6,7 @@
  *   <BlockRegion name="sidebar" types={{ sponsor: SponsorCard }} />
  *
  * `types` maps a custom block type's id to the component that renders it; each receives `block`
- * ({ id, type, style, dismissible, props, rev }). An empty region renders nothing. If the plugin or its route is
+ * ({ id, type, style, dismissible, width, props, rev }). An empty region renders nothing. If the plugin or its route is
  * unavailable the region is empty; a page never fails because of a block.
  */
 import { getPublicPluginApiRouteHandler } from "emdash/plugin-utils";

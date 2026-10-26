@@ -93,6 +93,14 @@ Default styles use `:where()`, so any selector of yours wins. Set variables or o
 Classes: `sb-region` (the region wrapper), `sb-block` (every block), `sb-notice`, `sb-richtext`, `sb-style-<style>`, `sb-body`, `sb-dismiss`.
 When a visitor dismisses a block the document gets a `sb:dismiss` event, so a layout that measures the region can update.
 
+## Notice fields, two links, and styles
+
+A notice has an optional label (`BETA`), an optional heading, a message, up to two links, and a choice for how the links look: text links, or buttons (the second link is the primary button). The admin's Style list comes from the notice type. The built-in styles are plain colours (`info`, `warning`, `promo`); a site that wants its own designs replaces the type with `siteBlocks({ types: [{ id: "notice", label: "Notice", styles: [...], fields: BUILTIN_TYPES[0].fields }] })` and styles `.sb-style-<value>` in its CSS. Every block renders inside `<aside class="sb-block sb-style-<value> sb-notice">` with `.sb-badge`, `.sb-heading`, `.sb-text` and `.sb-actions` inside.
+
+## Side by side
+
+Each block has a Width: Full or Half. A region lays its blocks out in rows: a full block takes a row, and half blocks that follow each other pair up (they stack on a narrow screen, and a lone half block grows to fill its row). Reorder blocks with Move up / Move down to choose who sits beside whom.
+
 ## Notice messages
 
 A notice's message can link words: `Visit our [contact page](/contact) or [suggest a playground](/submit).` Only `https://`, `http://` and `/page` addresses become links; anything else stays as typed text.
