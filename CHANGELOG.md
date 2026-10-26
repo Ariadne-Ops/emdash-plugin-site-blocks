@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Notice messages can hold `[words](address)` links, and may be up to 1000 characters.
+- Fixed: path patterns can no longer be made slow by a long path (linear matcher). Links refuse backslashes and control characters, and a notice's link is re-checked on render. Reordering or toggling a block no longer brings back blocks visitors dismissed. The fallback fetch times out after 1.5 s.
 - The published blocks are cached in memory for 30 seconds (`cacheSeconds` option; 0 turns it off). Admin edits clear it at once.
 
 ## 0.1.0

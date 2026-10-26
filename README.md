@@ -61,7 +61,7 @@ import BlockRegion from "emdash-plugin-site-blocks/astro/BlockRegion.astro";
 </body>
 ```
 
-An empty region renders nothing. If the plugin is unavailable, the region is empty; a page never fails because of a block.
+An empty region renders nothing. If the plugin or its route is unavailable, or a fetch times out, the region is empty and the page still renders. A custom type's own component is your code: if it throws, the page fails like any other component, so keep it defensive.
 
 ## Using it
 
@@ -129,8 +129,11 @@ A type with the id of a built-in replaces it.
 
 ## Security
 
+Dismissing a block uses a small inline script. Under a Content-Security-Policy that blocks inline scripts, add a nonce or hash for it, or dismissal will not be remembered.
+
+
 - Editors enter plain text. Messages are escaped by Astro; rich text is parsed into paragraphs, breaks and links, never HTML.
-- Link addresses must start with `https://`, `http://` or `/` (not `//`); anything else is refused when saving and again when rendering.
+- Link addresses must start with `https://`, `http://` or `/` (not `//`); anything else (including backslashes, spaces and control characters) is refused when saving and again when rendering a notice's link or a message link.
 - The public route returns only what a page needs (type, style, content, revision). Path rules and admin names stay private.
 - Input from the admin is validated on the server: region, type, status, weight, dates, path-list size, field lengths.
 

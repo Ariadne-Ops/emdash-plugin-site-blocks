@@ -37,7 +37,7 @@ const { block, class: className, label = "Site notice" } = Astro.props;
 <style is:global>
 	/* Zero-specificity defaults (:where), so a site restyles any of this with a plain selector. Colors come from --sb-* variables. */
 	:where(.sb-block) { display: flex; align-items: center; gap: 12px; padding: 8px 16px; background: var(--sb-bg, #1f2937); color: var(--sb-fg, #fff); font-size: 0.9rem; line-height: 1.4; }
-	:where(.sb-block[hidden]) { display: none; }
+	.sb-block[hidden] { display: none !important; } /* a dismissed block stays hidden even when a site restyles .sb-block */
 	:where(.sb-body) { flex: 1; min-width: 0; }
 	:where(.sb-block a) { color: var(--sb-link, inherit); text-decoration: underline; text-underline-offset: 2px; }
 	:where(.sb-dismiss) { flex: none; border: 0; background: none; color: inherit; font: inherit; font-size: 1.4rem; line-height: 1; cursor: pointer; padding: 0 4px; min-width: 32px; min-height: 32px; }

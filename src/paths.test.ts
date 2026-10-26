@@ -55,3 +55,19 @@ describe("isVisible", () => {
 		expect(isVisible("/about", { show: [], hide: ["/submit"] })).toBe(true);
 	});
 });
+
+describe("matchesPath on hostile input", () => {
+	it("stays fast with many wildcards and a long path that almost matches", () => {
+		const path = `/blog/${"a".repeat(1900)}`;
+		const t = Date.now();
+		expect(matchesPath(path, ["/blog/*a*a*a*a*a*b"])).toBe(false);
+		expect(matchesPath(path, ["*a*a*a*a*a*a*a*b"])).toBe(false);
+		expect(Date.now() - t).toBeLessThan(200);
+	});
+	it("still matches wildcards in the middle and several in a row", () => {
+		expect(matchesPath("/blog/a-b-c", ["/blog/*-*-*"])).toBe(true);
+		expect(matchesPath("/blog/a-b", ["/blog/*-*-*"])).toBe(false);
+		expect(matchesPath("/x/y/z", ["/x/**/z"])).toBe(true);
+		expect(matchesPath("/playground", ["/playground/*"])).toBe(false);
+	});
+});

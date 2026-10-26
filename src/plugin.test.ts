@@ -40,3 +40,14 @@ describe("the plugin's routes", () => {
 		expect(s.reads()).toBe(2);
 	});
 });
+
+describe("the fallback fetch", () => {
+	it("gives up after a short time instead of stalling the page", async () => {
+		const { loadRegion } = await import("./client");
+		const real = globalThis.fetch;
+		globalThis.fetch = ((req: Request) => new Promise((_, reject) => req.signal.addEventListener("abort", () => reject(new Error("aborted"))))) as any;
+		const t = Date.now();
+		try { expect(await loadRegion({ region: "above-header", path: "/", baseUrl: new URL("https://x.example/"), timeoutMs: 30 })).toEqual([]); } finally { globalThis.fetch = real; }
+		expect(Date.now() - t).toBeLessThan(1000);
+	});
+});

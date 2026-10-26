@@ -71,3 +71,11 @@ describe("BlockRegion", () => {
 		expect(seen).toEqual({ region: "below-header", path: "/playground/x" });
 	});
 });
+
+describe("Notice trailing link", () => {
+	it("is checked again when rendering, so a stored javascript: address never becomes a link", async () => {
+		const out = await html(Notice, { block: block({ props: { text: "Hi", linkText: "Go", linkUrl: "javascript:alert(1)" } }) });
+		expect(out).not.toContain("javascript:");
+		expect(out).not.toContain("<a ");
+	});
+});

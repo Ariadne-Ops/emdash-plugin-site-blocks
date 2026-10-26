@@ -8,7 +8,8 @@ export interface Collection<T> {
 	query(o?: { where?: Record<string, string | number | boolean | null>; orderBy?: Record<string, "asc" | "desc">; limit?: number; cursor?: string }): Promise<{ items: Array<{ id: string; data: T }>; cursor?: string; hasMore: boolean }>;
 }
 
-export interface StoredBlock extends BlockInput { id: string; createdAt: string; updatedAt: string }
+/** `rev` changes only when the content is edited (not on a move or status change), so a dismissed block stays dismissed until its content changes. */
+export interface StoredBlock extends BlockInput { id: string; createdAt: string; updatedAt: string; rev?: string }
 
 export function createStore(col: Collection<StoredBlock>, deps: { now?: () => Date; newId?: () => string } = {}) {
 	const now = deps.now ?? (() => new Date());
@@ -33,14 +34,14 @@ export function createStore(col: Collection<StoredBlock>, deps: { now?: () => Da
 		get: (id: string) => col.get(id).then((b) => (b ? { ...b, id } : null)),
 		async create(input: BlockInput): Promise<StoredBlock> {
 			const at = now().toISOString();
-			const block: StoredBlock = { ...input, id: newId(), createdAt: at, updatedAt: at };
+			const block: StoredBlock = { ...input, id: newId(), createdAt: at, updatedAt: at, rev: at };
 			await col.put(block.id, block);
 			return block;
 		},
 		async update(id: string, input: BlockInput): Promise<StoredBlock | null> {
 			const prev = await col.get(id);
 			if (!prev) return null;
-			const block: StoredBlock = { ...input, id, createdAt: prev.createdAt, updatedAt: now().toISOString() };
+			const block: StoredBlock = { ...input, id, createdAt: prev.createdAt, updatedAt: now().toISOString(), rev: now().toISOString() };
 			await col.put(id, block);
 			return block;
 		},

@@ -63,3 +63,20 @@ describe("store", () => {
 		expect((await s.get(other.id))?.weight).toBe(0); // other regions untouched
 	});
 });
+
+describe("rev", () => {
+	it("changes when a block's content is edited, not when it is moved or its status toggled", async () => {
+		let t = 0;
+		const s = createStore(fake(), { now: () => new Date(Date.UTC(2026, 9, 26, 12, 0, ++t)), newId: () => `r${t}` });
+		const a = await s.create(input({ weight: 0 }));
+		const b = await s.create(input({ weight: 10 }));
+		const revA = (await s.get(a.id))!.rev, revB = (await s.get(b.id))!.rev;
+		await s.move(a.id, "down");
+		await s.setStatus(a.id, "draft");
+		await s.setStatus(a.id, "published");
+		expect((await s.get(a.id))!.rev).toBe(revA);
+		expect((await s.get(b.id))!.rev).toBe(revB);
+		await s.update(a.id, input({ props: { text: "changed" } }));
+		expect((await s.get(a.id))!.rev).not.toBe(revA);
+	});
+});

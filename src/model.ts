@@ -64,7 +64,8 @@ export interface BlockInput {
 
 export type Validated = { ok: true; value: BlockInput } | { ok: false; errors: string[] };
 
-export const isSafeLink = (u: string) => /^https?:\/\//i.test(u) || (u.startsWith("/") && !u.startsWith("//"));
+/** https://, http:// or a path on this site. No spaces, control characters or backslashes: browsers read "/\\host" as "//host". */
+export const isSafeLink = (u: string) => !/[\s\\\u0000-\u001f\u007f]/.test(u) && (/^https?:\/\//i.test(u) || (u.startsWith("/") && !u.startsWith("//")));
 
 const str = (v: unknown) => (typeof v === "string" ? v : v == null ? "" : String(v));
 const isoOrNaN = (v: unknown) => { const s = str(v).trim(); return s ? Date.parse(s) : undefined; };
@@ -110,7 +111,7 @@ export function validateBlockInput(raw: unknown, cfg: Config): Validated {
 	const props: Record<string, string> = {};
 	const given = typeof o.props === "object" && o.props !== null ? (o.props as Record<string, unknown>) : {};
 	for (const f of def?.fields ?? []) {
-		const v = str(given[f.id]).trim();
+		const v = Object.hasOwn(given, f.id) ? str(given[f.id]).trim() : "";
 		if (!v) { if (f.required) errors.push(`${f.label} is required.`); continue; }
 		if (v.length > (f.max ?? 500)) { errors.push(`${f.label} can be at most ${f.max ?? 500} characters.`); continue; }
 		if (f.kind === "url" && !isSafeLink(v)) { errors.push(`${f.label} must start with https://, http:// or /.`); continue; }

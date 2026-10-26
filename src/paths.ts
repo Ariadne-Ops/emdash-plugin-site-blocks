@@ -25,12 +25,22 @@ function normalize(path: string): string {
 	return p.length > 1 ? p.replace(/\/+$/, "") || "/" : p;
 }
 
-const toRegExp = (pattern: string) =>
-	new RegExp(`^${normalize(pattern === "*" ? "/*" : pattern).replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*")}$`);
+/** Wildcard match without a regular expression, so a long path can never make it slow (greedy, remembers the last `*`). */
+function glob(pattern: string, text: string): boolean {
+	let p = 0, t = 0, star = -1, mark = 0;
+	while (t < text.length) {
+		if (p < pattern.length && pattern[p] === "*") { star = p++; mark = t; }
+		else if (p < pattern.length && pattern[p] === text[t]) { p++; t++; }
+		else if (star >= 0) { p = star + 1; t = ++mark; }
+		else return false;
+	}
+	while (pattern[p] === "*") p++;
+	return p === pattern.length;
+}
 
 export function matchesPath(path: string, patterns: string[]): boolean {
 	const p = normalize(path);
-	return patterns.some((pattern) => toRegExp(pattern).test(p));
+	return patterns.some((pattern) => glob(normalize(pattern === "*" ? "/*" : pattern), p));
 }
 
 export function isVisible(path: string, rules: PathRules): boolean {

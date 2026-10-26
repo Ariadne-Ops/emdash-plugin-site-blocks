@@ -8,10 +8,12 @@ const isBlock = (b: unknown): b is PublicBlock =>
 	typeof (b as any).dismissible === "boolean" && typeof (b as any).rev === "string" && typeof (b as any).props === "object" && (b as any).props !== null;
 
 /** What <BlockRegion> uses on the server. A broken or missing route means an empty region, never a broken page. */
-export async function loadRegion(o: { region: string; path: string; baseUrl: URL; handlePublicPluginApiRoute?: Handler }): Promise<PublicBlock[]> {
+export async function loadRegion(o: { region: string; path: string; baseUrl: URL; handlePublicPluginApiRoute?: Handler; timeoutMs?: number }): Promise<PublicBlock[]> {
 	try {
 		const request = new Request(new URL(`/_emdash/api/plugins/${PLUGIN_ID}/region`, o.baseUrl), {
 			method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ region: o.region, path: o.path }),
+			// Only the fallback fetch uses this: a self-request that hangs must not hold the page.
+			signal: AbortSignal.timeout(o.timeoutMs ?? 1500),
 		});
 		let payload: unknown;
 		if (o.handlePublicPluginApiRoute) payload = await o.handlePublicPluginApiRoute(PLUGIN_ID, "POST", "/region", request);

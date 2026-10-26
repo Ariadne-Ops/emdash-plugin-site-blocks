@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { BUILTIN_TYPES, validateBlockInput, type Config } from "./model";
+import { BUILTIN_TYPES, validateBlockInput, type Config, isSafeLink } from "./model";
 
 const cfg: Config = {
 	cacheSeconds: 30,
@@ -60,5 +60,20 @@ describe("validateBlockInput", () => {
 		expect(errs(ok({ style: "neon" }))).toContain("Choose one of the listed styles.");
 		const r = validateBlockInput(ok({ style: "warning", dismissible: false }), cfg);
 		expect(r.ok && [r.value.style, r.value.dismissible]).toEqual(["warning", false]);
+	});
+});
+
+describe("isSafeLink", () => {
+	it("refuses addresses a browser would read as another site, or that hide characters", () => {
+		for (const u of ["/\\evil.com", "/\t/evil.com", "/ok\nx", "//evil.com", "javascript:alert(1)", "https://a b.example"]) expect(isSafeLink(u), u).toBe(false);
+		for (const u of ["/contact", "/a/b?x=1#y", "https://example.com/a", "http://example.com"]) expect(isSafeLink(u), u).toBe(true);
+	});
+});
+
+describe("props lookup", () => {
+	it("never reads an inherited property such as constructor as a field value", () => {
+		const c: Config = { ...cfg, types: [{ id: "odd", label: "Odd", fields: [{ id: "constructor", label: "Odd field", kind: "text" }] }] };
+		const r = validateBlockInput({ region: "above-header", type: "odd", title: "t", status: "draft", weight: 0, props: {} }, c);
+		expect(r.ok && r.value.props).toEqual({});
 	});
 });
