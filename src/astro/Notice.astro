@@ -1,0 +1,11 @@
+---
+import BlockShell from "./BlockShell.astro";
+import type { PublicBlock } from "../public";
+interface Props { block: PublicBlock }
+const { block } = Astro.props;
+const { text = "", linkText = "", linkUrl = "" } = block.props;
+---
+<BlockShell block={block} class="sb-notice">
+	<span class="sb-text">{text}</span>
+	{linkUrl && <>{" "}<a class="sb-link" href={linkUrl}>{linkText || "Learn more"}</a></>}
+</BlockShell>

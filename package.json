@@ -1,22 +1,30 @@
 {
   "name": "emdash-plugin-site-blocks",
-  "version": "0.0.0",
-  "description": "Site-wide blocks for EmDash: place notices and other blocks into theme regions, with show/hide path rules.",
+  "version": "0.1.0",
+  "description": "Site-wide blocks for EmDash: place notices and other blocks into theme regions, with Drupal-style show/hide path rules.",
   "license": "MIT",
+  "keywords": ["emdash", "emdash-plugin", "cms", "astro", "blocks", "banner", "notice", "announcement", "regions"],
+  "repository": { "type": "git", "url": "git+https://github.com/Ariadne-Ops/emdash-plugin-site-blocks.git" },
+  "homepage": "https://github.com/Ariadne-Ops/emdash-plugin-site-blocks#readme",
+  "bugs": { "url": "https://github.com/Ariadne-Ops/emdash-plugin-site-blocks/issues" },
   "type": "module",
-  "files": ["dist", "README.md", "LICENSE"],
-  "scripts": {
-    "test": "vitest run",
-    "build": "tsdown",
-    "typecheck": "tsc --noEmit"
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": { "types": "./dist/index.d.mts", "import": "./dist/index.mjs" },
+    "./astro": "./src/astro/index.ts",
+    "./astro/*": "./src/astro/*",
+    "./package.json": "./package.json"
   },
-  "peerDependencies": {
-    "emdash": ">=1.3.0"
-  },
+  "files": ["dist", "src/astro", "src/client.ts", "src/public.ts", "src/render.ts", "src/model.ts", "src/constants.ts", "src/select.ts", "src/paths.ts", "README.md", "LICENSE", "CHANGELOG.md"],
+  "scripts": { "test": "vitest run", "build": "tsdown", "typecheck": "tsc --noEmit", "prepublishOnly": "bun run typecheck && bun run test && bun run build" },
+  "peerDependencies": { "astro": ">=6.0.0", "emdash": ">=1.3.0" },
   "devDependencies": {
     "@emdash-cms/blocks": "1.3.0",
-    "tsdown": "^0.12.0",
+    "astro": "7.4.0",
+    "emdash": "1.3.0",
+    "tsdown": "^0.23.1",
     "typescript": "^5.6.0",
-    "vitest": "^2.1.0"
+    "vitest": "^5.0.5"
   }
 }

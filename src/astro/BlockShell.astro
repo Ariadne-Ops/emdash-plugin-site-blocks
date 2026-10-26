@@ -1,0 +1,48 @@
+---
+/**
+ * The wrapper every block renders inside: the element that carries the block's id and revision, the dismiss button
+ * when the block allows it, and the dismissal memory. Custom block types should render inside it too.
+ *
+ * A dismissed block stays hidden for 14 days in that browser, and comes back sooner if it is edited (its revision changes).
+ * The check runs in a script right after the element, so a dismissed block never flashes.
+ */
+interface Props { block: { id: string; style: string; dismissible: boolean; rev: string }; class?: string; label?: string }
+const { block, class: className, label = "Site notice" } = Astro.props;
+---
+<aside class:list={["sb-block", `sb-style-${block.style}`, className]} aria-label={label} data-sb-block={block.id} data-sb-rev={block.rev}>
+	<div class="sb-body"><slot /></div>
+	{block.dismissible && <button type="button" class="sb-dismiss" aria-label="Dismiss">&times;</button>}
+</aside>
+{block.dismissible && (
+	<script is:inline>
+		(function () {
+			var el = document.currentScript.previousElementSibling;
+			try {
+				var d = JSON.parse(localStorage.getItem("sb:" + el.dataset.sbBlock) || "null");
+				if (d && d.rev === el.dataset.sbRev && Date.now() - d.at < 14 * 864e5) el.hidden = true;
+			} catch (e) {}
+			if (window.__sbDismiss) return;
+			window.__sbDismiss = true;
+			document.addEventListener("click", function (ev) {
+				var btn = ev.target && ev.target.closest && ev.target.closest(".sb-dismiss");
+				var box = btn && btn.closest("[data-sb-block]");
+				if (!box) return;
+				try { localStorage.setItem("sb:" + box.dataset.sbBlock, JSON.stringify({ rev: box.dataset.sbRev, at: Date.now() })); } catch (e) {}
+				box.hidden = true;
+				document.dispatchEvent(new CustomEvent("sb:dismiss", { detail: { id: box.dataset.sbBlock } }));
+			});
+		})();
+	</script>
+)}
+<style is:global>
+	/* Zero-specificity defaults (:where), so a site restyles any of this with a plain selector. Colors come from --sb-* variables. */
+	:where(.sb-block) { display: flex; align-items: center; gap: 12px; padding: 8px 16px; background: var(--sb-bg, #1f2937); color: var(--sb-fg, #fff); font-size: 0.9rem; line-height: 1.4; }
+	:where(.sb-block[hidden]) { display: none; }
+	:where(.sb-body) { flex: 1; min-width: 0; }
+	:where(.sb-block a) { color: var(--sb-link, inherit); text-decoration: underline; text-underline-offset: 2px; }
+	:where(.sb-dismiss) { flex: none; border: 0; background: none; color: inherit; font: inherit; font-size: 1.4rem; line-height: 1; cursor: pointer; padding: 0 4px; min-width: 32px; min-height: 32px; }
+	:where(.sb-style-warning) { --sb-bg: #92400e; }
+	:where(.sb-style-promo) { --sb-bg: #166534; }
+	:where(.sb-style-card) { border-radius: 12px; --sb-bg: #f3f4f6; --sb-fg: #111827; }
+	:where(.sb-style-plain) { --sb-bg: transparent; --sb-fg: inherit; padding-inline: 0; }
+</style>

@@ -1,0 +1,32 @@
+---
+/**
+ * Renders the published blocks placed in one region, for the current path.
+ *
+ *   <BlockRegion name="above-header" />
+ *   <BlockRegion name="sidebar" types={{ sponsor: SponsorCard }} />
+ *
+ * `types` maps a custom block type's id to the component that renders it; each receives `block`
+ * ({ id, type, style, dismissible, props, rev }). An empty region renders nothing. If the plugin or its route is
+ * unavailable the region is empty; a page never fails because of a block.
+ */
+import { getPublicPluginApiRouteHandler } from "emdash/plugin-utils";
+import { loadRegion } from "../client";
+import Notice from "./Notice.astro";
+import RichText from "./RichText.astro";
+
+interface Props { name: string; types?: Record<string, any>; class?: string }
+const { name, types = {}, class: className } = Astro.props;
+const blocks = await loadRegion({
+	region: name,
+	path: Astro.url.pathname,
+	baseUrl: Astro.url,
+	handlePublicPluginApiRoute: getPublicPluginApiRouteHandler(Astro.locals),
+});
+const registry: Record<string, any> = { notice: Notice, richtext: RichText, ...types };
+const shown = blocks.filter((b) => registry[b.type]);
+---
+{shown.length > 0 && (
+	<div class:list={["sb-region", className]} data-sb-region={name}>
+		{shown.map((b) => { const Block = registry[b.type]; return <Block block={b} />; })}
+	</div>
+)}

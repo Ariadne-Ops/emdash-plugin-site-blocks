@@ -1,0 +1,5 @@
+---
+import BlockShell from "./BlockShell.astro";
+const { block } = Astro.props;
+---
+<BlockShell block={block}>Sponsored by {block.props.name}</BlockShell>
