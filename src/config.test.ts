@@ -25,4 +25,12 @@ describe("resolveConfig", () => {
 	it("falls back to the default regions when every given region is malformed", () => {
 		expect(resolveConfig({ regions: [null as any] }).regions).toEqual(DEFAULT_REGIONS);
 	});
+	it("caches for 30 seconds unless told otherwise, and ignores a nonsense value", () => {
+		expect(resolveConfig().cacheSeconds).toBe(30);
+		expect(resolveConfig({ cacheSeconds: 0 }).cacheSeconds).toBe(0);
+		expect(resolveConfig({ cacheSeconds: 120 }).cacheSeconds).toBe(120);
+		expect(resolveConfig({ cacheSeconds: -5 }).cacheSeconds).toBe(30);
+		expect(resolveConfig({ cacheSeconds: Number.NaN }).cacheSeconds).toBe(30);
+		expect(resolveConfig({ cacheSeconds: 999999 }).cacheSeconds).toBe(3600);
+	});
 });

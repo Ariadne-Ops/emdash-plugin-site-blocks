@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { BUILTIN_TYPES, validateBlockInput, type Config } from "./model";
 
 const cfg: Config = {
+	cacheSeconds: 30,
 	regions: [{ id: "above-header", label: "Above header" }, { id: "footer-top", label: "Footer top" }],
 	types: [...BUILTIN_TYPES, { id: "sponsor", label: "Sponsor", fields: [{ id: "name", label: "Name", kind: "text", required: true }, { id: "tier", label: "Tier", kind: "select", options: [{ value: "a", label: "A" }] }] }],
 };
@@ -45,7 +46,7 @@ describe("validateBlockInput", () => {
 	});
 	it("validates props against the type's fields: required, length, select options, safe urls", () => {
 		expect(errs(ok({ props: {} }))).toContain("Message is required.");
-		expect(errs(ok({ props: { text: "x".repeat(501) } }))).toContain("Message can be at most 500 characters.");
+		expect(errs(ok({ props: { text: "x".repeat(1001) } }))).toContain("Message can be at most 1000 characters.");
 		expect(errs(ok({ props: { text: "hi", linkUrl: "javascript:alert(1)" } }))).toContain("Link address must start with https://, http:// or /.");
 		expect(errs(ok({ props: { text: "hi", linkUrl: "//evil.example" } }))).toContain("Link address must start with https://, http:// or /.");
 		expect(errs(ok({ type: "sponsor", props: { name: "A", tier: "z" } }))).toContain("Tier must be one of the listed choices.");

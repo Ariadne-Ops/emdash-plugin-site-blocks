@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Notice messages can hold `[words](address)` links, and may be up to 1000 characters.
+- The published blocks are cached in memory for 30 seconds (`cacheSeconds` option; 0 turns it off). Admin edits clear it at once.
+
 ## 0.1.0
 
 First release.

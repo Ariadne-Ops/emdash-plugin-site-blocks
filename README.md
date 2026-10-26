@@ -93,6 +93,14 @@ Default styles use `:where()`, so any selector of yours wins. Set variables or o
 Classes: `sb-region` (the region wrapper), `sb-block` (every block), `sb-notice`, `sb-richtext`, `sb-style-<style>`, `sb-body`, `sb-dismiss`.
 When a visitor dismisses a block the document gets a `sb:dismiss` event, so a layout that measures the region can update.
 
+## Notice messages
+
+A notice's message can link words: `Visit our [contact page](/contact) or [suggest a playground](/submit).` Only `https://`, `http://` and `/page` addresses become links; anything else stays as typed text.
+
+## Caching
+
+The server keeps the published blocks in memory for 30 seconds, so a page that renders several regions reads storage once. Edits made in the admin show at once on the server that took them, and on other servers within the window. Set `siteBlocks({ cacheSeconds: 0 })` to turn it off, or a number up to 3600.
+
 ## Custom block types
 
 Declare the type's fields as data when you configure the plugin, and render it with a component:

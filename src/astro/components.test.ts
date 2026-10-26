@@ -24,6 +24,13 @@ describe("Notice", () => {
 		expect(out).not.toContain("localStorage");
 		expect(out).not.toContain("<a ");
 	});
+	it("turns [words](address) in the message into links, leaves unsafe ones as text, and keeps the optional trailing link", async () => {
+		const out = await html(Notice, { block: block({ props: { text: "Visit our [contact page](/contact) or [bad](javascript:alert(1)).", linkText: "Suggest one", linkUrl: "/submit" } }) });
+		expect(out).toContain('<a class="sb-link" href="/contact">contact page</a>');
+		expect(out).toContain("[bad](javascript:alert(1))");
+		expect(out).not.toContain('href="javascript');
+		expect(out).toContain('<a class="sb-link" href="/submit">Suggest one</a>');
+	});
 	it("escapes the message, so stored text can never become markup", async () => {
 		const out = await html(Notice, { block: block({ props: { text: "<img src=x onerror=alert(1)>" } }) });
 		expect(out).not.toContain("<img");

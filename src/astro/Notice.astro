@@ -1,11 +1,14 @@
 ---
 import BlockShell from "./BlockShell.astro";
+import { parseRichText } from "../render";
 import type { PublicBlock } from "../public";
 interface Props { block: PublicBlock }
 const { block } = Astro.props;
 const { text = "", linkText = "", linkUrl = "" } = block.props;
+// The message may hold [words](address) links; blank lines and line breaks read as spaces in a one-line notice.
+const parts = parseRichText(text).flatMap((para, i) => [...(i ? [{ text: " " }] : []), ...para.map((p) => ("br" in p ? { text: " " } : p))]);
 ---
 <BlockShell block={block} class="sb-notice">
-	<span class="sb-text">{text}</span>
+	<span class="sb-text">{parts.map((p) => (p.href ? <a class="sb-link" href={p.href}>{p.text}</a> : p.text))}</span>
 	{linkUrl && <>{" "}<a class="sb-link" href={linkUrl}>{linkText || "Learn more"}</a></>}
 </BlockShell>

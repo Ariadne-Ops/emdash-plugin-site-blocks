@@ -4,7 +4,7 @@ import { loadRegion } from "./client";
 import { createStore, type Collection } from "./store";
 import { BUILTIN_TYPES, DEFAULT_REGIONS, type BlockInput, type Config } from "./model";
 
-const cfg: Config = { regions: DEFAULT_REGIONS, types: BUILTIN_TYPES };
+const cfg: Config = { regions: DEFAULT_REGIONS, types: BUILTIN_TYPES, cacheSeconds: 30 };
 const NOW = new Date("2026-10-26T12:00:00Z");
 function setup() {
 	const m = new Map<string, any>();

@@ -17,7 +17,7 @@ export interface BlockTypeDef {
 	/** Style choices; the first is the default. A type without any has the single style "default". */
 	styles?: Array<{ value: string; label: string }>;
 }
-export interface Config { regions: Region[]; types: BlockTypeDef[] }
+export interface Config { regions: Region[]; types: BlockTypeDef[]; cacheSeconds: number }
 
 export const BUILTIN_TYPES: BlockTypeDef[] = [
 	{
@@ -25,7 +25,7 @@ export const BUILTIN_TYPES: BlockTypeDef[] = [
 		label: "Notice",
 		styles: [{ value: "info", label: "Info" }, { value: "warning", label: "Warning" }, { value: "promo", label: "Promo" }],
 		fields: [
-			{ id: "text", label: "Message", kind: "text", required: true, max: 500 },
+			{ id: "text", label: "Message", kind: "textarea", required: true, max: 1000, help: "To link words, write [the words](/page) or [the words](https://example.com)" },
 			{ id: "linkText", label: "Link text", kind: "text", max: 60 },
 			{ id: "linkUrl", label: "Link address", kind: "url", max: 500, help: "Starts with https://, http:// or /" },
 		],
