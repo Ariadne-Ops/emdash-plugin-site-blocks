@@ -135,6 +135,86 @@ siteBlocks({
 (`emdash-plugin-site-blocks/astro/BlockShell.astro`) to get the wrapper, dismiss button and dismissal memory. Field kinds: `text`, `textarea`, `url`, `select`.
 A type with the id of a built-in replaces it.
 
+## Customizing: styles, options, regions and templates
+
+Everything a site chooses is plain data in the plugin options, plus CSS and, optionally, an Astro template. Working samples live in [`examples/`](examples/):
+[`astro.config.example.mjs`](examples/astro.config.example.mjs), [`blocks.example.css`](examples/blocks.example.css),
+[`SponsorCard.astro`](examples/SponsorCard.astro) and [`NoticeCustom.astro`](examples/NoticeCustom.astro). The tests render them, so they stay correct.
+
+### Add a style
+
+1. **Offer it in the admin.** Styles belong to a block type. List them on the type (the first is the default):
+   ```js
+   import { BUILTIN_TYPES, siteBlocks } from "emdash-plugin-site-blocks";
+   const notice = { ...BUILTIN_TYPES.find((t) => t.id === "notice"), styles: [
+     { value: "dark", label: "Dark strip" }, { value: "coral", label: "Coral announcement" },
+   ] };
+   siteBlocks({ types: [notice] });
+   ```
+2. **Style it.** The block gets the class `sb-style-<value>`. Colours come from variables, so a style can be a few lines
+   (see [`blocks.example.css`](examples/blocks.example.css)):
+   ```css
+   .sb-style-coral { --sb-bg: #fde4d8; --sb-fg: #2b2118; --sb-link: #8a3b17; --sb-badge-bg: #f08a5d; }
+   ```
+   The plugin's own defaults use `:where()`, so a plain selector in your CSS always wins.
+
+### Options an editor can choose
+
+A field's `kind` decides the control: `text`, `textarea`, `url` (must be `https://`, `http://` or `/page`) or `select`.
+A select lists its choices as `{ value, label }`; your template receives the `value`.
+Every field can be `required`, has a `max` length (500 by default) and an optional `help` hint.
+Every block, whatever its type, also has: region, style, width (full or half), dismissible, show/hide paths, status, weight and a schedule.
+
+### Add a region
+
+Declare it, then place it in a layout:
+
+```js
+siteBlocks({ regions: [{ id: "above-header", label: "Above header" }, { id: "sidebar", label: "Sidebar" }] })
+```
+```astro
+<BlockRegion name="sidebar" />
+```
+
+### Change how a block is drawn (templates)
+
+`<BlockRegion types={{ ... }}>` maps a type id to the component that draws it, for new types and for the built-in ones:
+
+```astro
+<BlockRegion name="footer-top" types={{ sponsor: SponsorCard }} />   <!-- a new type -->
+<BlockRegion name="above-header" types={{ notice: NoticeCustom }} />  <!-- replaces the built-in notice output -->
+```
+
+A template receives `block` = `{ id, type, style, dismissible, width, props, rev }`; `props` holds the type's fields as strings.
+Render inside `BlockShell` to get the wrapper, the dismiss button, the dismissal memory and the half/full width.
+Text you print is escaped by Astro; check any address you link (`isSafeLink` from `emdash-plugin-site-blocks/model`).
+See [`SponsorCard.astro`](examples/SponsorCard.astro) for a new type and [`NoticeCustom.astro`](examples/NoticeCustom.astro) for a replacement.
+
+### The markup the built-in notice produces
+
+```html
+<div class="sb-region" data-sb-region="above-header">
+  <aside class="sb-block sb-style-coral sb-notice" aria-label="Site notice"
+         data-sb-block="…" data-sb-rev="…" data-sb-width="full">
+    <div class="sb-body">
+      <span class="sb-badge">BETA</span>
+      <span class="sb-content">
+        <strong class="sb-heading">Heading</strong>
+        <span class="sb-text">Message with <a class="sb-link" href="/contact">a link</a>.</span>
+      </span>
+      <span class="sb-actions">
+        <a class="sb-link" href="/contact">Report a problem</a>
+        <a class="sb-btn sb-btn-primary" href="/submit">Suggest a playground</a>
+      </span>
+    </div>
+    <button type="button" class="sb-dismiss" aria-label="Dismiss">×</button>
+  </aside>
+</div>
+```
+
+`sb-link` is a text link; `sb-btn` is a button, and of the buttons the last one is `sb-btn-primary` and any other is `sb-btn-secondary`.
+Parts that are empty are left out, and an empty region renders nothing.
+
 ## Security
 
 Dismissing a block uses a small inline script. Under a Content-Security-Policy that blocks inline scripts, add a nonce or hash for it, or dismissal will not be remembered.

@@ -1,0 +1,27 @@
+/* Sample CSS for the plugin's output. The plugin's own defaults have zero specificity (:where), so any selector here wins.
+ * Markup of a notice:
+ *   <aside class="sb-block sb-style-{style} sb-notice" data-sb-block data-sb-rev data-sb-width="full|half" aria-label="Site notice">
+ *     <div class="sb-body">
+ *       <span class="sb-badge">BETA</span>
+ *       <span class="sb-content"><strong class="sb-heading">…</strong> <span class="sb-text">message with <a>links</a></span></span>
+ *       <span class="sb-actions"><a class="sb-link">…</a> <a class="sb-btn sb-btn-secondary">…</a> <a class="sb-btn sb-btn-primary">…</a></span>
+ *     </div>
+ *     <button class="sb-dismiss">×</button>   (only when the block can be dismissed)
+ *   </aside>
+ * Blocks sit in <div class="sb-region" data-sb-region="{name}">, a wrapping flex row.
+ */
+
+/* Colours come from variables, so a style can be one rule. */
+.sb-style-coral { --sb-bg: #fde4d8; --sb-fg: #2b2118; --sb-link: #8a3b17; --sb-badge-bg: #f08a5d; }
+.sb-style-coral .sb-btn-primary { background: #2b2118; color: #fff; border-color: #2b2118; }
+
+/* A layout style: a big band with the heading left and the actions right. */
+.sb-style-band { --sb-bg: #fde4d8; --sb-fg: #2b2118; padding: 40px 32px; }
+.sb-style-band .sb-body { justify-content: space-between; gap: 16px 32px; }
+.sb-style-band .sb-heading { display: block; font-size: 2rem; line-height: 1.1; }
+
+/* Side by side: half-width blocks that follow each other pair up. Change the gap here. */
+.sb-region { gap: 16px; }
+
+/* Your own template's classes. */
+.my-notice__copy { margin: 0; flex: 1 1 240px; }

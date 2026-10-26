@@ -1,0 +1,23 @@
+---
+/**
+ * A template that replaces the built-in Notice output. Give it to the region under the built-in type's id:
+ *
+ *   <BlockRegion name="above-header" types={{ notice: NoticeCustom }} />
+ *
+ * Keep the field names of the notice type (badge, heading, text, linkText, linkUrl, linkStyle, link2Text, link2Url, link2Style).
+ * Here the message is plain text only, the heading is optional, and there is a single call to action.
+ */
+import BlockShell from "emdash-plugin-site-blocks/astro/BlockShell.astro";
+import { isSafeLink } from "emdash-plugin-site-blocks/model";
+
+const { block } = Astro.props;
+const { badge = "", heading = "", text = "", linkText = "", linkUrl = "" } = block.props;
+const cta = isSafeLink(linkUrl) ? { href: linkUrl, label: linkText || "Learn more" } : null;
+---
+<BlockShell block={block} class="sb-notice my-notice">
+	{badge && <span class="sb-badge">{badge}</span>}
+	<p class="my-notice__copy">
+		{heading && <strong>{heading} </strong>}{text}
+	</p>
+	{cta && <a class="sb-btn sb-btn-primary" href={cta.href}>{cta.label}</a>}
+</BlockShell>

@@ -1,0 +1,23 @@
+---
+/**
+ * A template for a custom block type. It receives `block` ({ id, type, style, dismissible, width, props, rev }).
+ * Render inside BlockShell to get the wrapper, the dismiss button, the dismissal memory and the half/full width.
+ * Pair it with the "sponsor" type declared in astro.config.example.mjs:
+ *
+ *   <BlockRegion name="footer-top" types={{ sponsor: SponsorCard }} />
+ */
+import BlockShell from "emdash-plugin-site-blocks/astro/BlockShell.astro";
+import { isSafeLink } from "emdash-plugin-site-blocks/model";
+
+const { block } = Astro.props;
+const { name = "", url = "", tagline = "" } = block.props; // text arrives as plain strings and is escaped for you
+const href = isSafeLink(url) ? url : ""; // saved addresses are checked already; checking again costs nothing
+---
+<BlockShell block={block} class="sb-sponsor" label="Sponsor">
+	<span class="sb-badge">Sponsor</span>
+	<span class="sb-content">
+		<strong class="sb-heading">{name}</strong>
+		{tagline && <span class="sb-text">{tagline}</span>}
+	</span>
+	{href && <span class="sb-actions"><a class="sb-btn sb-btn-primary" href={href} rel="sponsored noopener">Visit</a></span>}
+</BlockShell>

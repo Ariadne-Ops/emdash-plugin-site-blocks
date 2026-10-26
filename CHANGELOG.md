@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Docs: a customizing guide (styles, options, regions, templates, the markup) and working samples in `examples/`, covered by tests. New export `emdash-plugin-site-blocks/model` for `isSafeLink`.
 - Blocks have a Width (full or half); half-width blocks sit side by side in a region.
 - Notices can have a label and a heading, up to two links, and draw each link as a text link or a button (chosen per link).
 - Notice messages can hold `[words](address)` links, and may be up to 1000 characters.

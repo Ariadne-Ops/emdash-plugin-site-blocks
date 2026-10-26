@@ -14,9 +14,10 @@
     ".": { "types": "./dist/index.d.mts", "import": "./dist/index.mjs" },
     "./astro": "./src/astro/index.ts",
     "./astro/*": "./src/astro/*",
+    "./model": "./src/model.ts",
     "./package.json": "./package.json"
   },
-  "files": ["dist", "src/astro", "!src/astro/*.test.ts", "!src/astro/components.fixture.astro", "src/client.ts", "src/store.ts", "src/public.ts", "src/render.ts", "src/model.ts", "src/constants.ts", "src/select.ts", "src/paths.ts", "README.md", "LICENSE", "CHANGELOG.md"],
+  "files": ["dist", "src/astro", "!src/astro/*.test.ts", "!src/astro/components.fixture.astro", "src/client.ts", "src/store.ts", "src/public.ts", "src/render.ts", "src/model.ts", "src/constants.ts", "src/select.ts", "src/paths.ts", "examples", "README.md", "LICENSE", "CHANGELOG.md"],
   "scripts": { "test": "vitest run", "build": "tsdown", "typecheck": "tsc --noEmit", "prepublishOnly": "bun run typecheck && bun run test && bun run build" },
   "peerDependencies": { "astro": ">=6.0.0", "emdash": ">=1.3.0" },
   "devDependencies": {
